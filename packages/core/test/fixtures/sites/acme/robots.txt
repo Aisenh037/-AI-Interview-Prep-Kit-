@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /acme/admin/
+Crawl-delay: 30
+Sitemap: http://localhost:8099/acme/sitemap.xml
