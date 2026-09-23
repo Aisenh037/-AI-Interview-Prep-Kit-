@@ -20,3 +20,7 @@ out/
 /out/
 .cache/
 *.log
+
+# Next.js build output
+/packages/web/.next/
+/packages/web/next-env.d.ts

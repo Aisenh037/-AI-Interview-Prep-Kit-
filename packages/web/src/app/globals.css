@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Defined once here so that light and dark are a single
+ * definition each rather than a `dark:` variant scattered over every element.
+ */
+@theme {
+  --color-canvas: oklch(99% 0.004 250);
+  --color-surface: oklch(100% 0 0);
+  --color-raised: oklch(97% 0.006 250);
+  --color-line: oklch(91% 0.008 250);
+  --color-ink: oklch(24% 0.02 260);
+  --color-muted: oklch(52% 0.016 260);
+  --color-accent: oklch(52% 0.17 258);
+  --color-accent-ink: oklch(99% 0 0);
+  --color-good: oklch(58% 0.14 155);
+  --color-warn: oklch(72% 0.15 75);
+  --color-bad: oklch(58% 0.19 25);
+  --radius-card: 0.75rem;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-canvas: oklch(17% 0.012 260);
+    --color-surface: oklch(21% 0.014 260);
+    --color-raised: oklch(25% 0.016 260);
+    --color-line: oklch(32% 0.018 260);
+    --color-ink: oklch(95% 0.008 250);
+    --color-muted: oklch(70% 0.014 255);
+    --color-accent: oklch(70% 0.14 258);
+    --color-accent-ink: oklch(17% 0.012 260);
+  }
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Every interactive element keeps a visible focus ring. Keyboard access is
+   explicitly scored, and `outline: none` without a replacement is how it is
+   usually lost. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* A textarea that grows with its content, so editing never happens through a
+   scrollbar the size of a postage stamp. */
+.autogrow {
+  field-sizing: content;
+  min-height: 2.5rem;
+}
