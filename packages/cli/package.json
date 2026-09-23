@@ -1,0 +1,7 @@
+{
+  "name": "@kit/cli",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": { "@kit/core": "*", "@kit/shared": "*", "dotenv": "^18.0.3", "p-limit": "^7.3.3" }
+}
