@@ -2,8 +2,12 @@ node_modules/
 dist/
 .next/
 out/
-coverage/
 *.tsbuildinfo
+
+# Build/test output at the repo root only — NOT source directories that happen
+# to be named the same thing (packages/core/src/coverage/ is real source).
+/coverage/
+/out/
 
 # Secrets — never commit
 .env
@@ -11,7 +15,7 @@ coverage/
 !.env.example
 
 # Batch output / caches
-kits.json
-kits.json.partial
+/kits.json
+/kits.json.partial
 .cache/
 *.log
