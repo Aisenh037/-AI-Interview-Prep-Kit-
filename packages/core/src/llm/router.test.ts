@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { LlmRouter } from './router.js';
+import { LlmRouter, type StructuredCall, type StructuredResult } from './router.js';
 import { createFixtureProvider } from './providers/fixture.js';
 import type { Clock } from './rateLimiter.js';
 
@@ -19,7 +19,9 @@ function fakeClock(): Clock & { elapsed(): number } {
   };
 }
 
-function call(router: LlmRouter, overrides: Partial<Parameters<LlmRouter['callStructured']>[0]> = {}) {
+type CallOverrides = Partial<Pick<StructuredCall<Answer>, 'callClass' | 'maxOutputTokens' | 'deadline'>>;
+
+function call(router: LlmRouter, overrides: CallOverrides = {}): Promise<StructuredResult<Answer>> {
   return router.callStructured<Answer>({
     callClass: 'extract',
     system: 'system',
@@ -28,12 +30,7 @@ function call(router: LlmRouter, overrides: Partial<Parameters<LlmRouter['callSt
     schemaName: 'answer',
     fallback: () => ({ answer: 'deterministic' }),
     ...overrides,
-  } as Parameters<LlmRouter['callStructured']>[0]) as Promise<{
-    value: Answer;
-    origin: 'model' | 'fallback';
-    warnings: string[];
-    usage: { calls: number };
-  }>;
+  });
 }
 
 describe('a kit is always producible', () => {
