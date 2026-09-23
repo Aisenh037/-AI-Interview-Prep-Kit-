@@ -197,3 +197,26 @@ describe('normalisation', () => {
     expect(normaliseUrl('')).toBeNull();
   });
 });
+
+describe('dual-stack hosts', () => {
+  // Regression guard. `localhost` resolves to ::1 before 127.0.0.1 on Windows.
+  // Pinning a connection to only the first validated address made every fetch
+  // against an IPv4-only server fail, and every kit was silently built from the
+  // job description alone — a broken pipeline that still reported success.
+  it('validates and returns every address for a dual-stack host', async () => {
+    const result = await validateUrl('http://localhost:8099/acme/', permissive, async () => [
+      { address: '::1' },
+      { address: '127.0.0.1' },
+    ]);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.addresses).toEqual(['::1', '127.0.0.1']);
+  });
+
+  it('still rejects the host if either address is disallowed under a strict policy', async () => {
+    const result = await validateUrl('http://dual.example/', strict, async () => [
+      { address: '93.184.216.34' },
+      { address: '::1' },
+    ]);
+    expect(result.ok).toBe(false);
+  });
+});

@@ -123,7 +123,10 @@ export async function startFixtureServer(port = 0): Promise<FixtureServer> {
     })();
   });
 
-  await new Promise<void>((resolve) => server.listen(port, '127.0.0.1', resolve));
+  // Bind every interface rather than 127.0.0.1 only. `localhost` resolves to
+  // ::1 before 127.0.0.1 on some platforms, and an IPv4-only listener makes a
+  // perfectly valid client look broken.
+  await new Promise<void>((resolve) => server.listen(port, resolve));
   const address = server.address();
   const actualPort = typeof address === 'object' && address !== null ? address.port : port;
 

@@ -86,15 +86,38 @@ const DEFAULTS = {
  * validation is unaffected.
  */
 function pinnedDispatcher(allowed: string[]): Dispatcher {
+  const entries = allowed.map((address) => ({
+    address,
+    family: address.includes(':') ? 6 : 4,
+  }));
+
   return new Agent({
     connect: {
-      lookup: (_hostname, _options, callback) => {
-        const address = allowed[0];
-        if (address === undefined) {
+      lookup: (_hostname, options, callback) => {
+        if (entries.length === 0) {
           callback(new Error('no validated address to connect to'), '', 4);
           return;
         }
-        callback(null, address, address.includes(':') ? 6 : 4);
+
+        // Hand back EVERY validated address when Node asks for them all, so it
+        // can fall back between families. Returning only the first is a real
+        // failure mode, not a theoretical one: `localhost` resolves to ::1
+        // before 127.0.0.1 on Windows, so pinning to the first address alone
+        // makes every fetch fail against an IPv4-only server.
+        const wantsAll = (options as { all?: boolean } | undefined)?.all === true;
+        if (wantsAll) {
+          callback(null, entries as never);
+          return;
+        }
+
+        const requested = (options as { family?: number } | undefined)?.family;
+        const match =
+          requested === 4 || requested === 6
+            ? entries.find((entry) => entry.family === requested)
+            : undefined;
+        // IPv4 first by default: it is the more universally reachable of the two.
+        const chosen = match ?? entries.find((entry) => entry.family === 4) ?? entries[0]!;
+        callback(null, chosen.address, chosen.family);
       },
     },
   });

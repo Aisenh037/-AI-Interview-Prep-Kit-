@@ -36,7 +36,8 @@
     "validate:kits": "tsx scripts/validate-kits.ts",
     "typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit",
     "typecheck:core": "tsc -p packages/core/tsconfig.json --noEmit",
-    "verify": "run-s lint typecheck test"
+    "verify": "run-s lint typecheck test",
+    "typecheck:cli": "tsc -p packages/cli/tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

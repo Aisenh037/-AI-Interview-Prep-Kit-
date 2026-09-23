@@ -16,6 +16,7 @@ out/
 
 # Batch output / caches
 /kits.json
-/kits.json.partial
+/kits.json.*.partial
+/out/
 .cache/
 *.log

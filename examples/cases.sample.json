@@ -1,0 +1,32 @@
+[
+  {
+    "id": "case-01-full",
+    "jd": "Senior Backend Engineer\nRemote (UK)\n\nAcme Robotics is looking for a senior backend engineer to own the ingestion pipeline behind our warehouse fleet.\n\nRequirements:\n- 5+ years building production services in Python\n- Must have deep PostgreSQL experience, including query tuning under load\n- Strong experience designing distributed systems that scale to millions of events per day\n- Experience mentoring junior engineers and reviewing their work\n\nNice to have:\n- Exposure to Kubernetes\n- Familiarity with the logistics or warehousing domain\n\nResponsibilities:\n- Own the event ingestion pipeline end to end\n- Work with field engineers to debug fleet issues in production\n- Set the technical direction for the data platform",
+    "company_url": "http://localhost:8099/acme/",
+    "days": 5
+  },
+  {
+    "id": "case-02-no-hiring-page",
+    "jd": "Embedded Software Engineer\nBristol, hybrid\n\nTuv Systems builds industrial sensing hardware. We need an embedded engineer for our next sensor generation.\n\nRequirements:\n- 3+ years of C or C++ on embedded targets\n- Experience with real-time operating systems\n- Must be comfortable debugging with an oscilloscope and a logic analyser\n\nNice to have:\n- Knowledge of CAN bus\n- Experience bringing a product through EMC certification",
+    "company_url": "http://localhost:8099/nohire/",
+    "days": 7
+  },
+  {
+    "id": "case-03-thin-jd",
+    "jd": "Frontend dev needed. React.",
+    "company_url": "http://localhost:8099/acme/",
+    "days": 3
+  },
+  {
+    "id": "case-04-unreachable-site",
+    "jd": "Data Engineer\n\nRequirements:\n- Strong SQL and dbt experience\n- 4+ years working with Airflow or similar orchestration\n- Must have experience with dimensional modelling\n\nNice to have:\n- Experience with Snowflake",
+    "company_url": "http://localhost:8099/no-such-company/",
+    "days": 1
+  },
+  {
+    "id": "case-05-long-runway",
+    "jd": "Platform Engineer\nRemote\n\nRequirements:\n- Must have production Kubernetes experience\n- 3+ years with Terraform and infrastructure as code\n- Experience running CI/CD pipelines at scale\n- Strong communication skills for working with product teams\n\nNice to have:\n- Go\n- Experience with service meshes",
+    "company_url": "http://localhost:8099/acme/",
+    "days": 60
+  }
+]
