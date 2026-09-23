@@ -46,6 +46,26 @@ const STRIP = 'script, style, noscript, svg, iframe, template, form, [aria-hidde
 /** Candidate containers for the main content, most specific first. */
 const MAIN_SELECTORS = ['main', 'article', '[role="main"]', '#content', '.content', 'body'];
 
+/**
+ * Node types derived from cheerio's own API rather than imported from domhandler,
+ * which is only a transitive dependency here.
+ */
+type Selection = ReturnType<cheerio.CheerioAPI>;
+type DomNode = Selection extends cheerio.Cheerio<infer N> ? N : never;
+
+function tagNameOf(node: DomNode): string {
+  const named = node as { tagName?: unknown };
+  return typeof named.tagName === 'string' ? named.tagName.toLowerCase() : '';
+}
+
+function isTextNode(node: DomNode): node is DomNode & { data?: string } {
+  return (node as { type?: unknown }).type === 'text';
+}
+
+function isTagNode(node: DomNode): boolean {
+  return (node as { type?: unknown }).type === 'tag';
+}
+
 export function extractPage(html: string, baseUrl: string): CleanPage {
   const $ = cheerio.load(html);
 
@@ -80,7 +100,7 @@ export function extractPage(html: string, baseUrl: string): CleanPage {
   $(STRIP).remove();
   $('nav, header, footer, aside, [role="navigation"]').remove();
 
-  let root = $('body');
+  let root: Selection = $('body');
   for (const selector of MAIN_SELECTORS) {
     const candidate = $(selector).first();
     if (candidate.length > 0 && candidate.text().trim().length > 0) {
@@ -143,12 +163,13 @@ function extractLinks($: cheerio.CheerioAPI, baseUrl: string): PageLink[] {
  * structure matters because hiring-process pages express their stages as lists,
  * and flattening them loses the ordering the classifier looks for.
  */
-function readableText($: cheerio.CheerioAPI, root: cheerio.Cheerio<never>): string {
+function readableText($: cheerio.CheerioAPI, root: Selection): string {
   const parts: string[] = [];
+  const BLOCK_TAGS = new Set(['p', 'div', 'section', 'tr', 'ul', 'ol', 'table', 'article']);
 
-  const walk = (node: never): void => {
+  const walk = (node: DomNode): void => {
     const el = $(node);
-    const tag = (node as unknown as { tagName?: string }).tagName?.toLowerCase() ?? '';
+    const tag = tagNameOf(node);
 
     if (tag === 'br') {
       parts.push('\n');
@@ -171,21 +192,17 @@ function readableText($: cheerio.CheerioAPI, root: cheerio.Cheerio<never>): stri
     }
 
     for (const child of children) {
-      const childNode = child as unknown as { type?: string; data?: string };
-      if (childNode.type === 'text') {
-        const text = childNode.data ?? '';
+      if (isTextNode(child)) {
+        const text = child.data ?? '';
         if (text.trim() !== '') parts.push(text);
-      } else if (childNode.type === 'tag') {
-        walk(child as never);
-        const childTag = (child as unknown as { tagName?: string }).tagName?.toLowerCase() ?? '';
-        if (['p', 'div', 'section', 'tr', 'ul', 'ol', 'table'].includes(childTag)) {
-          parts.push('\n');
-        }
+      } else if (isTagNode(child)) {
+        walk(child);
+        if (BLOCK_TAGS.has(tagNameOf(child))) parts.push('\n');
       }
     }
   };
 
-  for (const node of root.toArray()) walk(node as never);
+  for (const node of root.toArray()) walk(node);
 
   return parts
     .join(' ')

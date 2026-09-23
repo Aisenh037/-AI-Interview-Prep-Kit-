@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "description": "Turns a job description into a researched, editable interview preparation kit.",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "workspaces": [
     "packages/shared",
     "packages/core",
@@ -25,13 +27,16 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc -b --pretty",
+    "typecheck": "run-s typecheck:*",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "check:env": "tsx scripts/check-env.ts",
     "check:layers": "tsx scripts/check-layers.ts",
-    "validate:kits": "tsx scripts/validate-kits.ts"
+    "validate:kits": "tsx scripts/validate-kits.ts",
+    "typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit",
+    "typecheck:core": "tsc -p packages/core/tsconfig.json --noEmit",
+    "verify": "run-s lint typecheck test"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
