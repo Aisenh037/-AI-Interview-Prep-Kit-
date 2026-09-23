@@ -37,7 +37,8 @@
     "typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit",
     "typecheck:core": "tsc -p packages/core/tsconfig.json --noEmit",
     "verify": "run-s lint typecheck test",
-    "typecheck:cli": "tsc -p packages/cli/tsconfig.json --noEmit"
+    "typecheck:cli": "tsc -p packages/cli/tsconfig.json --noEmit",
+    "typecheck:api": "tsc -p packages/api/tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

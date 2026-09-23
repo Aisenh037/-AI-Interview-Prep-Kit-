@@ -127,9 +127,42 @@ const kitSchema = new Schema(
 kitSchema.index({ userId: 1, dedupeKey: 1, revision: 1 }, { unique: true });
 kitSchema.index({ userId: 1, createdAt: -1 });
 
-export type KitDoc = InferSchemaType<typeof kitSchema>;
+/**
+ * Explicit document interfaces rather than InferSchemaType.
+ *
+ * Mongoose 9's inference marks every nested object optional, which would force
+ * a null check on `kit.input.days` at a few dozen call sites for a field the
+ * schema declares required. Declaring the shape once here keeps the call sites
+ * honest without scattering assertions.
+ */
+export interface KitInput {
+  jd: string;
+  companyUrl: string;
+  days: number;
+}
+
+export interface KitDoc {
+  _id: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  title: string;
+  status: 'queued' | 'generating' | 'partial' | 'ready' | 'failed';
+  input: KitInput;
+  kit: unknown;
+  edited: { brief: string[]; role: string[] };
+  pinnedDays: number[];
+  sections: Map<string, unknown>;
+  research: unknown;
+  warnings: string[];
+  nextIds: { r: number; q: number; f: number; s: number };
+  dedupeKey: string;
+  revision: number;
+  version: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const KitModel: Model<KitDoc> =
-  (mongoose.models['Kit'] as Model<KitDoc>) ?? mongoose.model('Kit', kitSchema);
+  (mongoose.models['Kit'] as Model<KitDoc>) ?? mongoose.model<KitDoc>('Kit', kitSchema);
 
 // ---------------------------------------------------------------------------
 // Kit items — questions, flashcards, requirements and stories
@@ -190,9 +223,32 @@ const kitItemSchema = new Schema(
 kitItemSchema.index({ kitId: 1, listKey: 1, status: 1, rank: 1 });
 kitItemSchema.index({ kitId: 1, publicId: 1 }, { unique: true });
 
-export type KitItemDoc = InferSchemaType<typeof kitItemSchema>;
+export interface KitItemDoc {
+  _id: mongoose.Types.ObjectId;
+  kitId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  publicId: string;
+  type: 'requirement' | 'question' | 'flashcard' | 'story';
+  listKey: string;
+  rank: string;
+  status: 'active' | 'deleted' | 'superseded';
+  version: number;
+  createdBy: 'ai' | 'user';
+  lastEditedBy: 'ai' | 'user';
+  editedFields: string[];
+  pinned: boolean;
+  movedByUser: boolean;
+  contentHash: string;
+  introducedByRunId: string | null;
+  supersededByRunId: string | null;
+  data: unknown;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const KitItem: Model<KitItemDoc> =
-  (mongoose.models['KitItem'] as Model<KitItemDoc>) ?? mongoose.model('KitItem', kitItemSchema);
+  (mongoose.models['KitItem'] as Model<KitItemDoc>) ??
+  mongoose.model<KitItemDoc>('KitItem', kitItemSchema);
 
 // ---------------------------------------------------------------------------
 // Jobs
@@ -239,9 +295,32 @@ const jobSchema = new Schema(
 jobSchema.index({ kitId: 1, active: 1 }, { unique: true, partialFilterExpression: { active: true } });
 jobSchema.index({ status: 1, leaseExpiresAt: 1 });
 
-export type JobDoc = InferSchemaType<typeof jobSchema>;
+export interface JobDoc {
+  _id: mongoose.Types.ObjectId;
+  kitId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  kind: 'generate' | 'regenerate';
+  sectionKey: string | null;
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'stalled';
+  active?: boolean;
+  steps: unknown[];
+  events: unknown[];
+  lastSeq: number;
+  progress: number;
+  leaseOwner: string | null;
+  leaseExpiresAt: Date | null;
+  heartbeatAt: Date | null;
+  attempts: number;
+  cancelRequested: boolean;
+  error: unknown;
+  startedAt: Date | null;
+  finishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const Job: Model<JobDoc> =
-  (mongoose.models['Job'] as Model<JobDoc>) ?? mongoose.model('Job', jobSchema);
+  (mongoose.models['Job'] as Model<JobDoc>) ?? mongoose.model<JobDoc>('Job', jobSchema);
 
 // ---------------------------------------------------------------------------
 // Practice
