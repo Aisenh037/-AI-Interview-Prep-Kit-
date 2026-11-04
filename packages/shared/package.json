@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "zod": "^4.6.5",
+    "zod": "^4.6.7",
     "fractional-indexing": "^4.0.0"
   }
 }
